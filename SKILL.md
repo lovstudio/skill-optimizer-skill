@@ -18,7 +18,7 @@ compatibility: >
   locations are reported rather than assumed.
 metadata:
   author: lovstudio
-  version: "0.7.0"
+  version: "0.7.1"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
@@ -131,7 +131,10 @@ python3 scripts/inspect_layout.py --path /absolute/path/to/skill --json
 
 Do not report `remaining lint warnings: none` unless the final JSON was read.
 Do not report synchronization as complete unless every discovered distribution
-copy and required catalog check has been verified after the source change.
+copy and required catalog check has been verified after the source change. Keep
+`distribution_state`, `catalog_state`, and the aggregate `sync_state` separate:
+an installed copy can be `complete` while an undiscovered catalog keeps the
+aggregate state `partial`.
 
 ### Step 6: Synchronize discovered distributions
 

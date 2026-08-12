@@ -1,6 +1,6 @@
 # lov-skill-optimizer
 
-![Version](https://img.shields.io/badge/version-0.7.0-CC785C)
+![Version](https://img.shields.io/badge/version-0.7.1-CC785C)
 
 自动审计并优化 Agent Skill：按当前对话优先修复问题，统一 README、SKILL.md、
 `skill.yaml` 与 CHANGELOG 版本，然后核对规范源、安装副本和 catalog 的同步状态。
@@ -51,9 +51,9 @@ python3 scripts/lint_skill.py --all --root /absolute/path/to/skills --json
 
 ## 输出状态
 
-报告固定包含 `source`、`distribution`、`catalog` 和 `sync state`。状态可能是
-`complete`、`partial` 或 `not_discovered`；本地源码提交不等于 catalog 或线上页面
-已更新。
+报告固定包含 `source`、`distribution`、`catalog`、`distribution state`、
+`catalog state` 和 `sync state`。安装副本已同步但 catalog 未发现时，整体仍为
+`partial`；本地源码提交不等于 catalog 或线上页面已更新。
 
 ## 许可
 

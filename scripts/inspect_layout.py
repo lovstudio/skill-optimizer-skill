@@ -151,6 +151,12 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
     status = run_git(source, "status", "--porcelain=v1", "--untracked-files=all")
     branch = run_git(source, "branch", "--show-current")
     catalogs = [catalog_state(path, short_name) for path in catalog_candidates(source, catalog_roots)]
+    distribution_state = (
+        "complete"
+        if installations and all(item["state"] == "synced" for item in installations)
+        else "partial" if installations else "not_discovered"
+    )
+    catalog_state_value = "discovered" if catalogs else "not_discovered"
     return {
         "source": {
             "path": str(source),
@@ -162,11 +168,9 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
         },
         "installations": installations,
         "catalogs": catalogs,
-        "sync_state": (
-            "complete"
-            if installations and all(item["state"] == "synced" for item in installations)
-            else "partial" if installations or catalogs else "not_discovered"
-        ),
+        "distribution_state": distribution_state,
+        "catalog_state": catalog_state_value,
+        "sync_state": "complete" if distribution_state == "complete" and catalogs else "partial" if installations or catalogs else "not_discovered",
     }
 
 
@@ -191,6 +195,8 @@ def main() -> None:
         print(f"installation: {installation['path']} [{installation['state']}; {installation['kind']}]")
     for catalog in result["catalogs"]:
         print(f"catalog: {catalog['path']} [discovered; sync scripts={len(catalog['sync_scripts'])}]")
+    print(f"distribution state: {result['distribution_state']}")
+    print(f"catalog state: {result['catalog_state']}")
     print(f"sync state: {result['sync_state']}")
 
 

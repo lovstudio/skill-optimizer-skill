@@ -3,6 +3,13 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.7.1] - 2026-08-12
+
+### Fixed
+
+- separate distribution and catalog synchronization states
+- keep aggregate sync partial when a catalog is not discovered
+
 ## [0.7.0] - 2026-08-12
 
 ### Added
