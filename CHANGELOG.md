@@ -3,6 +3,15 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.7.0] - 2026-08-12
+
+### Added
+
+- add path-aware layout and synchronization auditing
+- keep README, SKILL.md, skill.yaml, and CHANGELOG versions aligned
+- report dirty, drifted, partial, and undiscovered distribution states
+- avoid requiring brand identity for a maintenance-only workflow
+
 ## [0.6.3] - 2026-05-07
 
 ### Fixed
