@@ -108,7 +108,7 @@ def catalog_candidates(source: Path, explicit_roots: list[str]) -> list[Path]:
     return list(dict.fromkeys(path for path in roots if path.is_dir()))
 
 
-def catalog_state(directory: Path, short_name: str) -> dict:
+def catalog_state(directory: Path, short_name: str, source_digest: str | None) -> dict:
     manifest = directory / "skills.yaml"
     sync_scripts = sorted(
         path.relative_to(directory).as_posix()
@@ -120,13 +120,27 @@ def catalog_state(directory: Path, short_name: str) -> dict:
         if any(part in IGNORED_DIRS for part in path.relative_to(directory).parts):
             continue
         if skill_short_name(path.parent) == short_name:
-            matching.append(path.parent.relative_to(directory).as_posix())
+            digest = tree_digest(path.parent)
+            matching.append(
+                {
+                    "path": path.parent.relative_to(directory).as_posix(),
+                    "digest": digest,
+                    "state": "synced" if digest == source_digest else "drifted",
+                }
+            )
+    state = (
+        "synced"
+        if matching and all(item["state"] == "synced" for item in matching)
+        else "drifted"
+        if matching
+        else "not_found"
+    )
     return {
         "path": str(directory),
         "manifest": str(manifest) if manifest.exists() else None,
         "sync_scripts": sync_scripts,
-        "matching_skill_paths": sorted(matching),
-        "state": "discovered",
+        "matching_skills": matching,
+        "state": state,
     }
 
 
@@ -150,13 +164,26 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
     git_root = run_git(source, "rev-parse", "--show-toplevel")
     status = run_git(source, "status", "--porcelain=v1", "--untracked-files=all")
     branch = run_git(source, "branch", "--show-current")
-    catalogs = [catalog_state(path, short_name) for path in catalog_candidates(source, catalog_roots)]
+    catalogs = [catalog_state(path, short_name, source_digest) for path in catalog_candidates(source, catalog_roots)]
     distribution_state = (
         "complete"
         if installations and all(item["state"] == "synced" for item in installations)
         else "partial" if installations else "not_discovered"
     )
-    catalog_state_value = "discovered" if catalogs else "not_discovered"
+    catalog_state_value = (
+        "complete"
+        if catalogs and all(item["state"] == "synced" for item in catalogs)
+        else "partial"
+        if catalogs
+        else "not_discovered"
+    )
+    sync_state = (
+        "complete"
+        if distribution_state == "complete" and catalog_state_value == "complete"
+        else "partial"
+        if installations or catalogs
+        else "not_discovered"
+    )
     return {
         "source": {
             "path": str(source),
@@ -170,7 +197,7 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
         "catalogs": catalogs,
         "distribution_state": distribution_state,
         "catalog_state": catalog_state_value,
-        "sync_state": "complete" if distribution_state == "complete" and catalogs else "partial" if installations or catalogs else "not_discovered",
+        "sync_state": sync_state,
     }
 
 
@@ -194,7 +221,7 @@ def main() -> None:
     for installation in result["installations"]:
         print(f"installation: {installation['path']} [{installation['state']}; {installation['kind']}]")
     for catalog in result["catalogs"]:
-        print(f"catalog: {catalog['path']} [discovered; sync scripts={len(catalog['sync_scripts'])}]")
+        print(f"catalog: {catalog['path']} [{catalog['state']}; sync scripts={len(catalog['sync_scripts'])}]")
     print(f"distribution state: {result['distribution_state']}")
     print(f"catalog state: {result['catalog_state']}")
     print(f"sync state: {result['sync_state']}")

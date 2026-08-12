@@ -18,7 +18,7 @@ compatibility: >
   locations are reported rather than assumed.
 metadata:
   author: lovstudio
-  version: "0.7.1"
+  version: "0.8.0"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
@@ -49,7 +49,8 @@ source checkout, an installed copy, or a catalog entry. Before editing:
    supplied path itself is canonical instead of silently editing another copy.
 4. Record every discovered installation and catalog path. A copy is `synced`
    only when its content digest matches the source; a missing location is
-   `not_discovered`, never `complete`.
+   `not_discovered`, never `complete`. A symlink is `synced` only when it
+   resolves to the canonical source.
 
 Do not absorb pre-existing edits into a maintenance commit. If a target file is
 already dirty, review the overlap before editing it and stage only the exact
@@ -134,19 +135,39 @@ Do not report synchronization as complete unless every discovered distribution
 copy and required catalog check has been verified after the source change. Keep
 `distribution_state`, `catalog_state`, and the aggregate `sync_state` separate:
 an installed copy can be `complete` while an undiscovered catalog keeps the
-aggregate state `partial`.
+aggregate state `partial`. A discovered catalog is `complete` only when its
+matching Skill payload digest is `synced`.
 
 ### Step 6: Synchronize discovered distributions
 
 `inspect_layout.py` checks conventional and configured installation roots:
 `AGENT_SKILLS_DIR`, `CLAUDE_SKILLS_DIR`, `CODEX_SKILLS_DIR`, `SKILLS_DIR`,
-`~/.agents/skills`, and `~/.codex/skills`. It also checks explicit
+plus the host's agent-managed fallback roots. It also checks explicit
 `--install-root` and `--catalog-root` values plus nearby `general-skills` and
-`dev-skills` checkouts.
+`dev-skills` checkouts. Use an environment variable or explicit flag when the
+installation root is outside the conventional layout.
 
-For a non-symlink installation copy, synchronize the canonical Skill payload
-and rerun the digest check. For a catalog, use its own scripts only when they
-are actually present:
+For a non-symlink installation copy, first run a read-only sync plan:
+
+```bash
+python3 scripts/sync_installation.py \
+  --source /absolute/path/to/canonical-skill \
+  --target /absolute/path/to/installed-skill \
+  --json
+```
+
+After reviewing `missing`, `changed`, and `extra`, apply the exact copy with:
+
+```bash
+python3 scripts/sync_installation.py \
+  --source /absolute/path/to/canonical-skill \
+  --target /absolute/path/to/installed-skill \
+  --apply --json
+```
+
+Use `--prune` only when removing extra files from the installation copy is
+explicitly part of the task. Symlink installations are verified, not copied.
+For a catalog, use its own scripts only when they are actually present:
 
 ```bash
 python3 scripts/sync-skills.py
@@ -213,6 +234,7 @@ python3 scripts/lint_skill.py --path PATH [--json]
 python3 scripts/lint_skill.py --all --root PATH [--json]
 python3 scripts/bump_version.py --path PATH --type patch|minor|major -m MESSAGE
 python3 scripts/inspect_layout.py --path PATH [--install-root PATH] [--catalog-root PATH] [--json]
+python3 scripts/sync_installation.py --source PATH --target PATH [--apply] [--prune] [--json]
 ```
 
 All bundled tools use Python's standard library only.

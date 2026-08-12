@@ -3,6 +3,14 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.8.0] - 2026-08-12
+
+### Added
+
+- add guarded installation-copy synchronization
+- compare catalog Skill digests instead of reporting discovery alone
+- keep agent installation roots configurable and symlink-aware
+
 ## [0.7.1] - 2026-08-12
 
 ### Fixed

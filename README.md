@@ -1,6 +1,6 @@
 # lov-skill-optimizer
 
-![Version](https://img.shields.io/badge/version-0.7.1-CC785C)
+![Version](https://img.shields.io/badge/version-0.8.0-CC785C)
 
 自动审计并优化 Agent Skill：按当前对话优先修复问题，统一 README、SKILL.md、
 `skill.yaml` 与 CHANGELOG 版本，然后核对规范源、安装副本和 catalog 的同步状态。
@@ -23,6 +23,16 @@ python3 scripts/lint_skill.py --path /absolute/path/to/skill --json
 # 检查规范源、安装副本和 catalog
 python3 scripts/inspect_layout.py --path /absolute/path/to/skill --json
 
+# 先比较安装副本，不写入
+python3 scripts/sync_installation.py \
+  --source /absolute/path/to/canonical-skill \
+  --target /absolute/path/to/installed-skill --json
+
+# 审阅后同步普通副本；符号链接只做校验
+python3 scripts/sync_installation.py \
+  --source /absolute/path/to/canonical-skill \
+  --target /absolute/path/to/installed-skill --apply --json
+
 # 统一版本并追加 CHANGELOG
 python3 scripts/bump_version.py \
   --path /absolute/path/to/skill \
@@ -43,7 +53,7 @@ python3 scripts/lint_skill.py --all --root /absolute/path/to/skills --json
 3. 只修改规范源；
 4. 统一版本、追加 CHANGELOG；
 5. 重新 lint 并读取布局检查结果；
-6. 同步已发现的安装副本和 catalog；
+6. 比较并同步已发现的安装副本和 catalog；
 7. 精确 staging、提交并推送，逐层报告失败状态。
 
 同一请求中出现多个 Skill 时，按用户给出的顺序逐个处理，每个 Skill 单独 bump
@@ -53,7 +63,8 @@ python3 scripts/lint_skill.py --all --root /absolute/path/to/skills --json
 
 报告固定包含 `source`、`distribution`、`catalog`、`distribution state`、
 `catalog state` 和 `sync state`。安装副本已同步但 catalog 未发现时，整体仍为
-`partial`；本地源码提交不等于 catalog 或线上页面已更新。
+`partial`；发现 catalog 后还要比较匹配 Skill 的 digest；本地源码提交不等于
+catalog 或线上页面已更新。
 
 ## 许可
 
