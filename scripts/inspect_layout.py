@@ -105,11 +105,18 @@ def catalog_candidates(source: Path, explicit_roots: list[str]) -> list[Path]:
     if environment:
         roots.extend(split_paths([environment]))
     git_root = run_git(source, "rev-parse", "--show-toplevel")
-    anchors = [source.parent]
+    anchors = [source.parent, source.parent.parent]
     if git_root:
-        anchors.append(Path(git_root).parent)
+        git_parent = Path(git_root).parent
+        anchors.extend((git_parent, git_parent.parent))
     for anchor in anchors:
-        for name in ("general-skills", "dev-skills"):
+        for name in (
+            "lovstudio-skills",
+            "lovstudio-general-skills",
+            "lovstudio-dev-skills",
+            "general-skills",
+            "dev-skills",
+        ):
             candidate = anchor / name
             if candidate.is_dir():
                 roots.append(candidate)

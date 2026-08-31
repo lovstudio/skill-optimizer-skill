@@ -20,7 +20,7 @@ depends_on:
   - lov-branding-consistency
 metadata:
   author: lovstudio
-  version: "0.11.0"
+  version: "0.11.1"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
@@ -193,9 +193,10 @@ matching Skill payload digest is `synced`.
 `inspect_layout.py` checks conventional and configured installation roots:
 `AGENT_SKILLS_DIR`, `CLAUDE_SKILLS_DIR`, `CODEX_SKILLS_DIR`, `SKILLS_DIR`,
 plus the host's agent-managed fallback roots. It also checks explicit
-`--install-root` and `--catalog-root` values plus nearby `general-skills` and
-`dev-skills` checkouts. Use an environment variable or explicit flag when the
-installation root is outside the conventional layout.
+`--install-root` and `--catalog-root` values plus the nearby unified
+`lovstudio-skills` catalog and legacy general/dev catalog names. Use an
+environment variable or explicit flag when the installation root is outside
+the conventional layout.
 
 For a non-symlink installation copy, first run a read-only sync plan. Paid
 repositories automatically use their `public/` payload:
