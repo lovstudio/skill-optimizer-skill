@@ -3,6 +3,15 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.11.0] - 2026-08-31
+
+### Added
+
+- support paid Skill repositories with src and public payload layouts
+- separate approved baselines, requested deltas, and rejected remedies before optimization
+- version authored and public Skill surfaces together
+- detect stale encrypted manifests before distribution sync
+
 ## [0.10.0] - 2026-08-30
 
 ### Added
