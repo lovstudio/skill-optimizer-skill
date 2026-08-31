@@ -16,6 +16,8 @@ compatibility: >
   for source commit/push verification. Catalog synchronization is discovered
   from explicit paths, environment variables, or nearby checkouts; unavailable
   locations are reported rather than assumed.
+depends_on:
+  - lov-branding-consistency
 metadata:
   author: lovstudio
   version: "0.10.0"
@@ -108,6 +110,12 @@ reusable Skill: move personal paths to flags, environment variables, or
 `references/user-config.md`, or mark a genuinely author-only dependency in
 `compatibility`.
 
+Classify the Skill's normal output before editing. If it generates, edits,
+reviews, renders, packages, or publishes text visible to an end user or reader,
+top-level `depends_on` must contain `lov-branding-consistency`. This dependency
+gates authored presentation copy only; it must not rewrite quotations,
+transcripts, source data, legal text, identifiers, or code without permission.
+
 ### Step 3: Apply focused fixes
 
 Edit only the canonical source. Keep the Skill's public trigger surface,
@@ -125,6 +133,7 @@ The linter checks:
 - TODO placeholders and oversized instruction bodies;
 - personal paths, fixed runtime paths, and missing user configuration;
 - source/install/catalog layout evidence.
+- missing `lov-branding-consistency` dependency for audience-visible text Skills.
 
 ### Step 4: Bump semver and changelog
 

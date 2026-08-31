@@ -3,11 +3,13 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
-## [0.10.0] - 2026-08-24
+## [0.10.0] - 2026-08-30
 
 ### Added
 
 - add the shared feedback-classification and approval-invalidation gate used by every LovStudio Skill
+- audit audience-visible Skills for the branding consistency dependency
+- preserve authoritative source text while gating authored presentation copy
 
 ## [0.9.0] - 2026-08-24
 
