@@ -3,6 +3,14 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.12.0] - 2026-09-06
+
+### Added
+
+- add read-only collection inventory with explicit canonical candidates
+- discover installation aliases and distinguish broken links and wrong payload targets
+- keep sync plans side-effect free and reject missing paid public payloads
+
 ## [0.11.1] - 2026-08-31
 
 ### Fixed

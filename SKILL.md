@@ -20,7 +20,7 @@ depends_on:
   - lov-branding-consistency
 metadata:
   author: lovstudio
-  version: "0.11.1"
+  version: "0.12.0"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
@@ -32,6 +32,27 @@ generic lint pass. When several Skills are named in one request, process them
 in the order named and emit a separate result block for each Skill.
 
 ## Target and source resolution
+
+For a collection audit, generate a read-only inventory first:
+
+```bash
+python3 scripts/inspect_layout.py --all --root /absolute/path/to/skills --json
+```
+
+The inventory groups actual frontmatter IDs across source candidates, discovers
+installation aliases by identity or resolved target, and records full payload
+digests separately from catalog state. `canonical_candidate` is an inference
+from a unique source or unique linked payload, never authorization to overwrite
+another source. Ambiguous IDs stay unresolved. Generated output, templates and
+paid `src`/`public` variants are not independent source entries; Kit modules are.
+Lifecycle is `disabled` only for a disabled specification and otherwise remains
+`unclassified` until its owner supplies a product decision.
+
+Treat `wrong_target`, `broken_link`, unavailable digests and non-versioned
+sources explicitly. A symlink is synchronized only when it resolves to the
+selected installable payload; a paid repository root is not its public payload.
+Missing public payloads must never fall back to distributing plaintext source.
+Collection audit does not synchronize, delete, publish or rewrite any target.
 
 Prefer an explicit canonical path whenever the Skill is outside a conventional
 skills repository:
@@ -286,10 +307,17 @@ python3 scripts/lint_skill.py --path PATH [--json]
 python3 scripts/lint_skill.py --all --root PATH [--json]
 python3 scripts/bump_version.py --path PATH --type patch|minor|major -m MESSAGE
 python3 scripts/inspect_layout.py --path PATH [--install-root PATH] [--catalog-root PATH] [--json]
+python3 scripts/inspect_layout.py --all --root PATH [--install-root PATH] [--catalog-root PATH] --json
 python3 scripts/sync_installation.py --source PATH --target PATH [--apply] [--prune] [--json]
 ```
 
 All bundled tools use Python's standard library only.
+
+Layout and synchronization regression checks:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
+```
 
 ## 通用反馈闭环
 
