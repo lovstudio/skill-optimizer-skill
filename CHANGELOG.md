@@ -3,6 +3,25 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.13.2] - 2026-09-07
+
+### Added
+
+- 统一展示名为「Skill 精修师」，保持调用 ID 与能力契约。
+
+## [0.13.1] - 2026-09-07
+
+### Fixed
+
+- Respect approved product names, memorable role names and brand-prefix boundaries
+
+## [0.13.0] - 2026-09-07
+
+### Added
+
+- add capability-based Skill naming review
+- review display names for accuracy, brevity, elegance and consistency while preserving compatibility identifiers
+
 ## [0.12.0] - 2026-09-06
 
 ### Added

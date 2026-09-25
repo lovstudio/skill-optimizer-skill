@@ -6,7 +6,7 @@ description: >
   Audit and optimize one or more existing Agent Skills from a canonical source
   path, then bump semver, update README/SKILL.md/skill.yaml/CHANGELOG.md, and
   verify installed copies and catalog synchronization. Checks frontmatter,
-  trigger quality, CLI hygiene, naming, portability, version drift, dirty
+  trigger quality, CLI hygiene, accurate and concise naming, portability, version drift, dirty
   worktrees, shared Skill feedback policy, and compatibility contracts. Use when the user asks to optimize,
   refine, audit, polish, or update a Skill, or mentions "优化 skill", "skill
   审计", "刷一遍 skill", "skill-optimizer", or "update skill changelog".
@@ -20,11 +20,11 @@ depends_on:
   - lov-branding-consistency
 metadata:
   author: lovstudio
-  version: "0.12.0"
+  version: "0.13.2"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
-# skill-optimizer — 自动优化 Agent Skill 并维护版本与分发状态
+# Skill 精修师 · Skill Refiner
 
 This is a non-interactive maintenance workflow. It infers the target and
 prioritizes issues from the current conversation, then supplements them with a
@@ -150,6 +150,15 @@ gates authored presentation copy only; it must not rewrite quotations,
 transcripts, source data, legal text, identifiers, or code without permission.
 
 ### Step 3: Apply focused fixes
+
+For naming feedback or a collection naming audit, first read
+[Skill naming review](references/skill-naming.md). Start from user-approved names
+and style examples, then review real capabilities and neighboring Skills for
+accuracy, brevity, memorability, elegance and consistency. Preserve product
+personality instead of forcing functional labels or banning role words.
+Record both changed and retained names. Distinguish
+display fields from compatibility identifiers, and do not infer permission to
+rename IDs, repositories or Profile keys from a display-name correction.
 
 Edit only the canonical source. Keep the Skill's public trigger surface,
 compatibility aliases, storage contracts, and user-facing semantics explicit.
