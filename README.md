@@ -1,6 +1,6 @@
 # Skill 精修师 · Skill Refiner
 
-![Version](https://img.shields.io/badge/version-0.13.2-CC785C)
+![Version](https://img.shields.io/badge/version-0.13.3-CC785C)
 
 自动审计并优化 Agent Skill：按当前对话优先修复问题，统一 README、SKILL.md、
 `skill.yaml` 与 CHANGELOG 版本，然后核对规范源、安装副本和 catalog 的同步状态。
@@ -79,7 +79,8 @@ python3 scripts/lint_skill.py --all --root /absolute/path/to/skills --json
 报告固定包含 `source`、`distribution`、`catalog`、`distribution state`、
 `catalog state` 和 `sync state`。安装副本已同步但 catalog 未发现时，整体仍为
 `partial`；发现 catalog 后还要比较匹配 Skill 的 digest；本地源码提交不等于
-catalog 或线上页面已更新。
+catalog 或线上页面已更新。已归档的 general/dev 分拆 catalog 本地检出标为 `legacy`，
+不计入 catalog state。
 
 ## 许可
 

@@ -20,7 +20,7 @@ depends_on:
   - lov-branding-consistency
 metadata:
   author: lovstudio
-  version: "0.13.2"
+  version: "0.13.3"
   tags: meta skill-maintenance versioning changelog lint portability sync
 ---
 
@@ -224,9 +224,11 @@ matching Skill payload digest is `synced`.
 `AGENT_SKILLS_DIR`, `CLAUDE_SKILLS_DIR`, `CODEX_SKILLS_DIR`, `SKILLS_DIR`,
 plus the host's agent-managed fallback roots. It also checks explicit
 `--install-root` and `--catalog-root` values plus the nearby unified
-`lovstudio-skills` catalog and legacy general/dev catalog names. Use an
-environment variable or explicit flag when the installation root is outside
-the conventional layout.
+`lovstudio-skills` catalog. Nearby checkouts named after the archived
+general/dev split catalogs are reported as `legacy` and excluded from
+`catalog_state`; pass one with `--catalog-root` only to compare it on purpose.
+Use an environment variable or explicit flag when the installation root is
+outside the conventional layout.
 
 For a non-symlink installation copy, first run a read-only sync plan. Paid
 repositories automatically use their `public/` payload:
@@ -290,7 +292,7 @@ source:    <canonical path> (<clean|dirty>)
 distribution:
   - <path>: <synced|drifted|not_discovered>
 catalog:
-  - <path>: <synced|partial|not_discovered>
+  - <path>: <synced|partial|not_discovered|legacy>
 fixes:
   - <bullet 1>
   - <bullet 2>

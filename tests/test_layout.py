@@ -116,6 +116,21 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(result["identities"][0]["canonical_candidate"], str(first))
         self.assertEqual(result["identities"][0]["selection_evidence"], "unique_installation_target")
 
+    def test_archived_split_catalog_is_legacy_unless_explicit(self):
+        source = self.skill()
+        for catalog, body in (("lovstudio-skills", "Test instructions.\n"), ("lovstudio-dev-skills", "Stale mirror.\n")):
+            mirror = self.sources / catalog / "skills" / "source"
+            mirror.mkdir(parents=True)
+            (mirror / "SKILL.md").write_text("---\nname: lov-source\n---\n" + body)
+        result = self.inspect(source)
+        states = {Path(item["path"]).name: item["state"] for item in result["catalogs"]}
+        self.assertEqual(states, {"lovstudio-skills": "synced", "lovstudio-dev-skills": "legacy"})
+        self.assertEqual(result["catalog_state"], "complete")
+        explicit = layout.inspect(source, [str(self.installs)], [str(self.sources / "lovstudio-dev-skills")])
+        states = {Path(item["path"]).name: item["state"] for item in explicit["catalogs"]}
+        self.assertEqual(states["lovstudio-dev-skills"], "drifted")
+        self.assertEqual(explicit["catalog_state"], "partial")
+
 
 if __name__ == "__main__":
     unittest.main()

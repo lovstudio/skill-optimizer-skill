@@ -3,6 +3,13 @@
 All notable changes to this skill are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) · Versioning: [SemVer](https://semver.org/)
 
+## [0.13.3] - 2026-09-25
+
+### Fixed
+
+- inspect_layout.py 将已归档的 general/dev 分拆 catalog 本地检出标为 `legacy`，不再计入 `catalog_state` 与 `sync_state`；通过 `--catalog-root` 显式传入时仍按普通 catalog 比较。
+- 新增回归测试覆盖 legacy 标记与显式传入两种情况；SKILL.md、README 与报告模板同步说明。
+
 ## [0.13.2] - 2026-09-07
 
 ### Added

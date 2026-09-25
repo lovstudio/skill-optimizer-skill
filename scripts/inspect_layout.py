@@ -24,6 +24,9 @@ from bump_version import read_version_sources
 IGNORED_DIRS = {".git", ".worktrees", "node_modules", "dist", "build", "target", ".venv", "venv", "__pycache__", "output"}
 DISCOVERY_IGNORED = IGNORED_DIRS | {"assets", "templates", "examples", "fixtures", "tests", "cases", "references", "scripts", "workbuddy", "skillpay"}
 INSTALL_ENV_VARS = ("AGENT_SKILLS_DIR", "CLAUDE_SKILLS_DIR", "CODEX_SKILLS_DIR", "SKILLS_DIR")
+# lovstudio/general-skills and lovstudio/dev-skills were archived in 2026-08 and
+# lovstudio/skills became the only index, so stale split checkouts are not drift.
+LEGACY_CATALOG_NAMES = ("lovstudio-general-skills", "lovstudio-dev-skills", "general-skills", "dev-skills")
 
 
 def skill_spec(source: Path) -> Path | None:
@@ -150,28 +153,24 @@ def installation_candidates(source: Path, explicit_roots: list[str]) -> list[Pat
     return list(dict.fromkeys(result))
 
 
-def catalog_candidates(source: Path, explicit_roots: list[str]) -> list[Path]:
+def catalog_candidates(source: Path, explicit_roots: list[str]) -> list[tuple[Path, bool]]:
+    """Return (catalog, legacy) pairs; an explicitly configured root is never legacy."""
     roots = split_paths(explicit_roots)
     environment = os.environ.get("LOV_SKILL_CATALOG_ROOT")
     if environment:
         roots.extend(split_paths([environment]))
+    candidates = {path: False for path in roots if path.is_dir()}
     git_root = run_git(source, "rev-parse", "--show-toplevel")
     anchors = [source.parent, source.parent.parent]
     if git_root:
         git_parent = Path(git_root).parent
         anchors.extend((git_parent, git_parent.parent))
     for anchor in anchors:
-        for name in (
-            "lovstudio-skills",
-            "lovstudio-general-skills",
-            "lovstudio-dev-skills",
-            "general-skills",
-            "dev-skills",
-        ):
+        for name in ("lovstudio-skills", *LEGACY_CATALOG_NAMES):
             candidate = anchor / name
             if candidate.is_dir():
-                roots.append(candidate)
-    return list(dict.fromkeys(path for path in roots if path.is_dir()))
+                candidates.setdefault(candidate, name in LEGACY_CATALOG_NAMES)
+    return list(candidates.items())
 
 
 @lru_cache(maxsize=None)
@@ -185,7 +184,7 @@ def catalog_index(directory: Path) -> tuple:
     return paths, sorted(scripts)
 
 
-def catalog_state(directory: Path, short_name: str, source_digest: str | None, identity: str | None = None) -> dict:
+def catalog_state(directory: Path, short_name: str, source_digest: str | None, identity: str | None = None, legacy: bool = False) -> dict:
     manifest = directory / "skills.yaml"
     paths, sync_scripts = catalog_index(directory)
     matching = []
@@ -200,7 +199,9 @@ def catalog_state(directory: Path, short_name: str, source_digest: str | None, i
                 }
             )
     state = (
-        "synced"
+        "legacy"
+        if legacy
+        else "synced"
         if matching and all(item["state"] == "synced" for item in matching)
         else "drifted"
         if matching
@@ -245,7 +246,11 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
     git_root = run_git(source, "rev-parse", "--show-toplevel")
     status = run_git(source, "status", "--porcelain=v1", "--untracked-files=all")
     branch = run_git(source, "branch", "--show-current")
-    catalogs = [catalog_state(path, short_name, payload_digest, skill_name(source)) for path in catalog_candidates(source, catalog_roots)]
+    catalogs = [
+        catalog_state(path, short_name, payload_digest, skill_name(source), legacy)
+        for path, legacy in catalog_candidates(source, catalog_roots)
+    ]
+    live_catalogs = [item for item in catalogs if item["state"] != "legacy"]
     distribution_state = (
         "complete"
         if installations and all(item["state"] == "synced" for item in installations)
@@ -253,16 +258,16 @@ def inspect(source: Path, install_roots: list[str], catalog_roots: list[str]) ->
     )
     catalog_state_value = (
         "complete"
-        if catalogs and all(item["state"] == "synced" for item in catalogs)
+        if live_catalogs and all(item["state"] == "synced" for item in live_catalogs)
         else "partial"
-        if catalogs
+        if live_catalogs
         else "not_discovered"
     )
     sync_state = (
         "complete"
         if distribution_state == "complete" and catalog_state_value == "complete"
         else "partial"
-        if installations or catalogs
+        if installations or live_catalogs
         else "not_discovered"
     )
     return {
